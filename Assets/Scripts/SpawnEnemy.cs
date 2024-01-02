@@ -1,21 +1,37 @@
+using System.Collections;
 using UnityEngine;
 
 public class SpawnEnemy : MonoBehaviour
 {
     [SerializeField] private EnemyMove _enemyPrefab;
 
-    [SerializeField] private RedefinedMover _targets;
+    [SerializeField] private GameObject[] _spawnPoints;
+
+    [SerializeField] private RedefinedMover[] _targets;
 
     private EnemyMove _enemy;
+    private int _spawnTime = 2;
+    private bool _isSpawn = true;
 
     private void Start()
     {
-        _enemy = Instantiate(_enemyPrefab, transform.position, Quaternion.Euler(0, Random.Range(0, 360), 0));
+        StartCoroutine(SpawnEnemys());
     }
 
-    private void Update()
+    private IEnumerator SpawnEnemys()
     {
-        _enemy.SetTarget(_targets.transform.position);
+        var waitSpawn = new WaitForSeconds(_spawnTime);
+
+        while (_isSpawn)
+        {
+            int randomIndex = Random.Range(0, _targets.Length);
+
+            _enemy = Instantiate(_enemyPrefab, _spawnPoints[randomIndex].transform);
+
+            _enemy.SetTarget(_targets[randomIndex].transform);
+
+            yield return waitSpawn;
+        }
     }
 }
 
